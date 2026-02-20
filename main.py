@@ -19,7 +19,7 @@ if not TOKEN:
 # Bot Setup
 intents = discord.Intents.default()
 intents.message_content = True
-intents.members = True # Required for welcome messages
+
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -29,7 +29,7 @@ async def on_ready():
     logger.info('------')
     
     # Load Cogs
-    initial_extensions = ['cogs.general', 'cogs.music']
+    initial_extensions = ['cogs.general', 'cogs.messaging']
     for extension in initial_extensions:
         try:
             await bot.load_extension(extension)
