@@ -1,33 +1,23 @@
-# Bit_Bot 🎵🤖
+# Bit_Bot 📩🤖
 
-Bit_Bot is a feature-rich Discord bot designed to bring high-quality music playback and general utility commands to your server. Built with Python and `discord.py`, it supports YouTube, Spotify links, and custom welcome images.
+Bit_Bot is a lightweight, personal messaging relay bot for Discord. It forwards all Direct Messages (DMs) to the bot owner and allows them to reply or speak in channels through the bot.
 
 ## Features ✨
 
-*   **Music Playback**:
-    *   Play audio from YouTube videos and search queries.
-    *   **Spotify Support**: seamlessly handles Spotify track, album, and playlist links by finding their YouTube equivalents.
-    *   Queue management (add, view, skip).
-    *   High-quality audio streaming using `yt-dlp` and `ffmpeg`.
-*   **General Utilities**:
-    *   `!ping`: Check bot latency.
-    *   **Welcome System**: Automatically generates and sends a custom welcome image card when a new member joins.
+*   **DM Forwarding**: Automatically forwards any DM sent to the bot to the owner.
+*   **Reply System**: Reply to users directly via DM using the `!reply` command.
+*   **Channel Speaking**: Send messages to any server channel using the `!say` command.
+*   **Lightweight**: Minimal dependencies, optimized for low-resource hosting (e.g., 308MB RAM).
 
 ## Prerequisites 🛠️
 
-Before you begin, ensure you have the following installed:
-
-1.  **Python 3.8+**: [Download Python](https://www.python.org/downloads/)
-2.  **FFmpeg**: Required for audio processing.
-    *   **Windows**: [Download FFmpeg](https://ffmpeg.org/download.html), extract it, and add the `bin` folder to your System PATH.
-    *   **Linux**: `sudo apt install ffmpeg`
-    *   **Mac**: `brew install ffmpeg`
+*   **Python 3.8+**
 
 ## Installation 📥
 
-1.  **Clone the repository** (or download the source code):
+1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/Bit_Bot.git
+    git clone https://github.com/Adarsh-Aravind/Discord-Bot.git
     cd Bit_Bot
     ```
 
@@ -38,40 +28,27 @@ Before you begin, ensure you have the following installed:
 
 ## Configuration ⚙️
 
-1.  Create a file named `.env` in the root directory.
-2.  Add your API keys and tokens in the following format:
-
+1.  Create a `.env` file in the root directory:
     ```env
     DISCORD_TOKEN=your_discord_bot_token_here
-    SPOTIFY_CLIENT_ID=your_spotify_client_id_here
-    SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
     ```
-
-    > **Note**: To get Spotify credentials, go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/applications) and create an app.
+2.  **Note**: The Owner ID is currently hardcoded in `cogs/messaging.py`. If you fork this, change `OWNER_ID` to your own Discord User ID.
 
 ## Usage 🚀
 
-Run the bot using:
-
+Run the bot:
 ```bash
 python main.py
 ```
 
-### Commands
+### Commands (Owner Only)
 
-| Command | Description |
-| :--- | :--- |
-| `!play <url/query>` | Plays a song from YouTube or Spotify. |
-| `!skip` | Skips the current song. |
-| `!queue` | Shows the current music queue. |
-| `!stop` | Stops playback and clears the queue. |
-| `!join` | Joins your voice channel. |
-| `!ping` | Checks if the bot is responsive. |
-
-## Contributing 🤝
-
-Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes.
+| Command | Usage | Description |
+| :--- | :--- | :--- |
+| `!reply` | `!reply <user_id> <message>` | Sends a DM to the specified user. |
+| `!say` | `!say <channel_id> <message>` | Sends a message to the specified channel. |
+| `!ping` | `!ping` | Checks bot latency. |
 
 ## License 📄
 
-This project is open-source and available under the content of the repository.
+This project is open-source.
