@@ -7,7 +7,7 @@ Copy your entire project folder to your Ubuntu machine (e.g., to `/home/youruser
 Run this on your Ubuntu terminal:
 ```bash
 sudo apt update
-sudo apt install python3-venv python3-pip ffmpeg -y
+sudo apt install python3-venv python3-pip -y
 ```
 
 ## 3. Setup Python Environment

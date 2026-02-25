@@ -1,44 +1,65 @@
-import os
+﻿import os
+import logging
 import discord
 from discord.ext import commands
-import logging
 from dotenv import load_dotenv
+import aiosqlite
 
-# Setup Logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('bitbot')
-
-# Load Environment Variables
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = os.getenv("DISCORD_TOKEN")
 
-if not TOKEN:
-    logger.error("DISCORD_TOKEN not found in .env file")
-    exit(1)
+logging.basicConfig(level=logging.INFO)
 
-# Bot Setup
 intents = discord.Intents.default()
 intents.message_content = True
 
+bot = commands.Bot(
+    command_prefix="!",
+    intents=intents,
+    help_command=None
+)
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+@bot.event
+async def setup_hook():
+    bot.db = await aiosqlite.connect("database.db")
+
+    await bot.db.execute("""
+    CREATE TABLE IF NOT EXISTS levels (
+        user_id INTEGER PRIMARY KEY,
+        xp INTEGER DEFAULT 0,
+        level INTEGER DEFAULT 0
+    )
+    """)
+
+    await bot.db.execute("""
+    CREATE TABLE IF NOT EXISTS youtube (
+        channel_id TEXT PRIMARY KEY,
+        last_video TEXT
+    )
+    """)
+
+    await bot.db.commit()
+
+    for ext in [
+        "cogs.general",
+        "cogs.messaging",
+        "cogs.leveling",
+        "cogs.antispam",
+        "cogs.youtube"
+    ]:
+        await bot.load_extension(ext)
 
 @bot.event
 async def on_ready():
-    logger.info(f'Logged in as {bot.user} (ID: {bot.user.id})')
-    logger.info('------')
-    
-    # Load Cogs
-    initial_extensions = ['cogs.general', 'cogs.messaging']
-    for extension in initial_extensions:
-        try:
-            await bot.load_extension(extension)
-            logger.info(f'Loaded extension: {extension}')
-        except Exception as e:
-            logger.error(f'Failed to load extension {extension}: {e}')
+    print(f"Logged in as {bot.user}")
 
-if __name__ == '__main__':
-    try:
-        bot.run(TOKEN)
-    except Exception as e:
-        logger.error(f"Bot execution failed: {e}")
+# 🔥 ONLY ONE PLACE PROCESSING COMMANDS
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    await bot.process_commands(message)
+
+def run():
+    bot.run(TOKEN, reconnect=True)
