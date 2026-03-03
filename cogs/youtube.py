@@ -2,10 +2,12 @@
 from discord.ext import commands, tasks
 import feedparser
 
+import os
+
 CHANNELS = {
-    "UCWOMTp0BLi41FTn6ouh_mdg": 1478341428567347261,
-    "UCCYq8CHiJR3Y8IEME0SgNUQ": 898826137407455263,
-    "UCKK4jwSOaKBSTqQjNRbndng": 1473220881454203073
+    "UCWOMTp0BLi41FTn6ouh_mdg": int(os.getenv("YT_CHANNEL_1", 0)),
+    "UCCYq8CHiJR3Y8IEME0SgNUQ": int(os.getenv("YT_CHANNEL_2", 0)),
+    "UCKK4jwSOaKBSTqQjNRbndng": int(os.getenv("YT_CHANNEL_3", 0))
 }
 
 class YouTube(commands.Cog):
