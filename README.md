@@ -7,7 +7,10 @@ Bit_Bot is a lightweight, personal messaging relay bot for Discord. It forwards 
 *   **DM Forwarding**: Automatically forwards any DM sent to the bot to the owner.
 *   **Reply System**: Reply to users directly via DM using the `!reply` command.
 *   **Channel Speaking**: Send messages to any server channel using the `!say` command.
-*   **Lightweight**: Minimal dependencies, optimized for low-resource hosting (e.g., 308MB RAM).
+*   **Formula 1 Integration**: Real-time driver and constructor standings, upcoming race schedules with track layouts, and historical race information for specific circuits.
+*   **Automated Leveling**: An integrated XP/level system for active chat members.
+*   **YouTube Notifications**: Automatically annouces new videos uploaded by predefined channels with custom embeds.
+*   **Lightweight**: Minimal dependencies, optimized for low-resource hosting.
 
 ## Prerequisites 🛠️
 
@@ -47,7 +50,22 @@ python main.py
 | :--- | :--- | :--- |
 | `!reply` | `!reply <user_id> <message>` | Sends a DM to the specified user. |
 | `!say` | `!say <channel_id> <message>` | Sends a message to the specified channel. |
-| `!ping` | `!ping` | Checks bot latency. |
+| `!setpresence` | `!setpresence <type> <text>` | Changes the bot's custom activity status (e.g. playing, watching). |
+| `!levelreset` | `!levelreset [user]` | Resets a specific user's level, or entirely resets the tracker if no user. |
+
+### Commands (Public)
+
+| Command | Description |
+| :--- | :--- |
+| `!help` | Displays the custom help menu with all available public commands. |
+| `!f1` | Displays the complete F1 current season info (Drivers, Constructors, Next Race). |
+| `!f1next` | Displays information and an official track layout picture for the upcoming race. |
+| `!f1c {circuit}` | Searches for a specific circuit (e.g., "Miami") and displays info along with the previous winner. |
+| `!f1con` | Displays only the top 10 constructor standings. |
+| `!f1dri` | Displays only the top 10 driver standings. |
+| `!status` | Displays basic metrics about the Discord server (members, roles, creation date). |
+| `!ping` | Checks bot latency. |
+| `!rank` | Shows the user's current level and XP. |
 
 ## License 📄
 

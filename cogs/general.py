@@ -13,38 +13,37 @@ class General(commands.Cog):
 
     @commands.command()
     async def help(self, ctx):
-        if ctx.author.id != OWNER_ID:
-            return
-
         embed = discord.Embed(
             title="🤖 Bit Beast Bot Commands",
             color=discord.Color.blue()
         )
 
-        embed.add_field(
-            name="📊 Leveling",
-            value="`!rank`\n`!levelreset @user`\n`!levelreset`",
-            inline=False
-        )
-
-        embed.add_field(
-            name="📩 Owner Commands",
-            value="`!reply <user_id> <message>`\n"
-                  "`!say <channel_id> <message>`\n"
-                  "`!status <playing|watching|listening|competing> <text>`",
-            inline=False
-        )
-
-        embed.add_field(
-            name="⚡ Utility",
-            value="`!ping`",
-            inline=False
-        )
+        embed.add_field(name="🏎️ F1 Commands", value="`!f1` - Shows current season info (Drivers, Constructors, Next Race)\n`!f1next` - Shows info and a picture of the next race circuit\n`!f1c {circuit}` - Shows information and previous winner for a specific circuit\n`!f1con` - Shows only constructor standings\n`!f1dri` - Shows only driver standings", inline=False)
+        embed.add_field(name="⚙️ General", value="`!status` - Shows the status of the server\n`!ping` - Shows the bot's latency", inline=False)
 
         await ctx.send(embed=embed)
 
     @commands.command()
-    async def status(self, ctx, activity_type: str, *, text: str):
+    async def status(self, ctx):
+        # Shows status of the server
+        guild = ctx.guild
+        if not guild:
+            await ctx.send("This command can only be used in a server.")
+            return
+            
+        embed = discord.Embed(title=f"Server Status: {guild.name}", color=discord.Color.green())
+        embed.add_field(name="Members", value=str(guild.member_count), inline=True)
+        embed.add_field(name="Roles", value=str(len(guild.roles)), inline=True)
+        embed.add_field(name="Channels", value=str(len(guild.channels)), inline=True)
+        embed.add_field(name="Created At", value=guild.created_at.strftime("%d %b %Y"), inline=False)
+        
+        if guild.icon:
+            embed.set_thumbnail(url=guild.icon.url)
+            
+        await ctx.send(embed=embed)
+
+    @commands.command(name="setpresence")
+    async def set_presence(self, ctx, activity_type: str, *, text: str):
         if ctx.author.id != OWNER_ID:
             return
 

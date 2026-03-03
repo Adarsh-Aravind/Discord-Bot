@@ -45,7 +45,8 @@ async def setup_hook():
         "cogs.messaging",
         "cogs.leveling",
         "cogs.antispam",
-        "cogs.youtube"
+        "cogs.youtube",
+        "cogs.f1"
     ]:
         await bot.load_extension(ext)
 

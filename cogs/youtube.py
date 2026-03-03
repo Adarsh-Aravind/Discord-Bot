@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 import feedparser
 
 CHANNELS = {
-    "UCWOMTp0BLi41FTn6ouh_mdg": 691590679541055488,
+    "UCWOMTp0BLi41FTn6ouh_mdg": 1478341428567347261,
     "UCCYq8CHiJR3Y8IEME0SgNUQ": 898826137407455263,
     "UCKK4jwSOaKBSTqQjNRbndng": 1473220881454203073
 }
@@ -55,12 +55,13 @@ class YouTube(commands.Cog):
                 await self.bot.db.commit()
 
                 embed = discord.Embed(
-                    title=f"🎥 {latest_entry.author} Uploaded!",
-                    description=f"https://www.youtube.com/watch?v={video_id}",
+                    title=f"🎥 {latest_entry.author} just posted a video! Go check it out!",
+                    description=f"**[{latest_entry.title}](https://www.youtube.com/watch?v={video_id})**",
                     color=discord.Color.red()
                 )
+                embed.set_image(url=f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg")
 
-                await channel.send(embed=embed)
+                await channel.send(content="Hey! @everyone", embed=embed)
 
     @check.before_loop
     async def before_check(self):
