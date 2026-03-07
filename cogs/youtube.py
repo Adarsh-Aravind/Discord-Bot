@@ -36,25 +36,30 @@ class YouTube(commands.Cog):
             video_id = latest_entry.get("yt_videoid")
 
             async with self.bot.db.execute(
-                "SELECT last_video FROM youtube WHERE channel_id = ?",
+                "SELECT channel_id FROM youtube_history WHERE channel_id = ?",
                 (yt_id,)
+            ) as cursor:
+                has_history = await cursor.fetchone()
+
+            async with self.bot.db.execute(
+                "SELECT video_id FROM youtube_history WHERE channel_id = ? AND video_id = ?",
+                (yt_id, video_id)
             ) as cursor:
                 row = await cursor.fetchone()
 
             if row is None:
                 await self.bot.db.execute(
-                    "INSERT INTO youtube VALUES (?, ?)",
+                    "INSERT INTO youtube_history (channel_id, video_id) VALUES (?, ?)",
+                    (yt_id, video_id)
+                )
+                await self.bot.db.execute(
+                    "INSERT OR REPLACE INTO youtube (channel_id, last_video) VALUES (?, ?)",
                     (yt_id, video_id)
                 )
                 await self.bot.db.commit()
-                continue
 
-            if row[0] != video_id:
-                await self.bot.db.execute(
-                    "UPDATE youtube SET last_video = ? WHERE channel_id = ?",
-                    (video_id, yt_id)
-                )
-                await self.bot.db.commit()
+                if has_history is None:
+                    continue
 
                 embed = discord.Embed(
                     title=f"🎥 {latest_entry.author} just posted a video! Go check it out!",

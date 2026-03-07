@@ -38,6 +38,20 @@ async def setup_hook():
     )
     """)
 
+    await bot.db.execute("""
+    CREATE TABLE IF NOT EXISTS youtube_history (
+        channel_id TEXT,
+        video_id TEXT,
+        PRIMARY KEY (channel_id, video_id)
+    )
+    """)
+
+    # Migrate existing last_video to history to avoid re-notifying
+    await bot.db.execute("""
+    INSERT OR IGNORE INTO youtube_history (channel_id, video_id)
+    SELECT channel_id, last_video FROM youtube WHERE last_video IS NOT NULL
+    """)
+
     await bot.db.commit()
 
     for ext in [
