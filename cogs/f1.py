@@ -37,7 +37,7 @@ class F1Command(commands.Cog):
             return []
 
     def _get_next_race(self):
-        data = self._fetch_data("current.json")
+        data = self._fetch_data("races.json")
         try:
             races = data['MRData']['RaceTable']['Races']
             now_utc = datetime.now(pytz.utc)
@@ -258,7 +258,7 @@ class F1Command(commands.Cog):
     @commands.command(name="f1last")
     async def f1_last(self, ctx):
         async with ctx.typing():
-            data = self._fetch_data("current.json")
+            data = self._fetch_data("races.json")
             try:
                 races = data['MRData']['RaceTable']['Races']
                 now_utc = datetime.now(pytz.utc)
@@ -285,7 +285,7 @@ class F1Command(commands.Cog):
                 
                 season = last_race['season']
                 round_num = last_race['round']
-                results_data = self._fetch_data(f"{season}/{round_num}/results.json")
+                results_data = self._fetch_data(f"{round_num}/results.json")
                 
                 embed = discord.Embed(title=f"🏎️ Last Race: {last_race['raceName']}", color=discord.Color.red())
                 embed.description = f"**Circuit:** {last_race['Circuit']['circuitName']}\n**Date:** {last_race['date']}"
