@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import urllib.request
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 
 class F1Command(commands.Cog):
@@ -37,22 +37,48 @@ class F1Command(commands.Cog):
             return []
 
     def _get_next_race(self):
-        data = self._fetch_data("next.json")
+        data = self._fetch_data("current.json")
         try:
-            race = data['MRData']['RaceTable']['Races'][0]
-            # Parse UTC time and convert to IST
-            utc_time_str = f"{race['date']}T{race['time']}"
-            utc_dt = datetime.strptime(utc_time_str, "%Y-%m-%dT%H:%M:%SZ")
-            utc_dt = pytz.utc.localize(utc_dt)
-            ist_dt = utc_dt.astimezone(pytz.timezone('Asia/Kolkata'))
+            races = data['MRData']['RaceTable']['Races']
+            now_utc = datetime.now(pytz.utc)
+            
+            next_race = None
+            for race in races:
+                time_str = race.get('time', '00:00:00Z')
+                utc_time_str = f"{race['date']}T{time_str}"
+                try:
+                    utc_dt = datetime.strptime(utc_time_str, "%Y-%m-%dT%H:%M:%SZ")
+                    utc_dt = pytz.utc.localize(utc_dt)
+                except ValueError:
+                    utc_dt = datetime.strptime(race['date'], "%Y-%m-%d")
+                    utc_dt = pytz.utc.localize(utc_dt)
+                
+                # Consider race 'over' 2.5 hours after start
+                end_time = utc_dt + timedelta(hours=2, minutes=30)
+                if now_utc < end_time:
+                    next_race = race
+                    break
+            
+            if not next_race:
+                return None
+            
+            time_str = next_race.get('time', '00:00:00Z')
+            utc_time_str = f"{next_race['date']}T{time_str}"
+            try:
+                utc_dt = datetime.strptime(utc_time_str, "%Y-%m-%dT%H:%M:%SZ")
+                utc_dt = pytz.utc.localize(utc_dt)
+                ist_dt = utc_dt.astimezone(pytz.timezone('Asia/Kolkata'))
+                date_str = ist_dt.strftime("%d %B %Y at %I:%M %p IST")
+            except ValueError:
+                date_str = next_race['date']
             
             return {
-                "name": race['raceName'],
-                "circuit": race['Circuit']['circuitName'],
-                "circuit_id": race['Circuit']['circuitId'],
-                "date": ist_dt.strftime("%d %B %Y at %I:%M %p IST")
+                "name": next_race['raceName'],
+                "circuit": next_race['Circuit']['circuitName'],
+                "circuit_id": next_race['Circuit']['circuitId'],
+                "date": date_str
             }
-        except (KeyError, IndexError):
+        except (KeyError, IndexError, TypeError):
             return None
 
     def _build_driver_embed(self, standings):
@@ -228,6 +254,62 @@ class F1Command(commands.Cog):
             embed.set_footer(text=f"Note: The displayed circuit layout may vary from current {current_year} FIA Formula 1 regulations")
 
             await ctx.send(embed=embed)
+
+    @commands.command(name="f1last")
+    async def f1_last(self, ctx):
+        async with ctx.typing():
+            data = self._fetch_data("current.json")
+            try:
+                races = data['MRData']['RaceTable']['Races']
+                now_utc = datetime.now(pytz.utc)
+                last_race = None
+                
+                for race in races:
+                    time_str = race.get('time', '00:00:00Z')
+                    utc_time_str = f"{race['date']}T{time_str}"
+                    try:
+                        utc_dt = datetime.strptime(utc_time_str, "%Y-%m-%dT%H:%M:%SZ")
+                        utc_dt = pytz.utc.localize(utc_dt)
+                    except ValueError:
+                        utc_dt = datetime.strptime(race['date'], "%Y-%m-%d")
+                        utc_dt = pytz.utc.localize(utc_dt)
+                    
+                    if now_utc >= utc_dt:
+                        last_race = race
+                    else:
+                        break
+                
+                if not last_race:
+                    await ctx.send("No races have started yet this season.")
+                    return
+                
+                season = last_race['season']
+                round_num = last_race['round']
+                results_data = self._fetch_data(f"{season}/{round_num}/results.json")
+                
+                embed = discord.Embed(title=f"🏎️ Last Race: {last_race['raceName']}", color=discord.Color.red())
+                embed.description = f"**Circuit:** {last_race['Circuit']['circuitName']}\n**Date:** {last_race['date']}"
+                
+                if results_data and results_data['MRData']['RaceTable']['Races']:
+                     results = results_data['MRData']['RaceTable']['Races'][0]['Results']
+                     top_3 = results[:3]
+                     results_text = "🏆 **Podium:**\n"
+                     medal = ["🥇", "🥈", "🥉"]
+                     for i, res in enumerate(top_3):
+                         driver = res['Driver']
+                         results_text += f"{medal[i]} {driver['givenName']} {driver['familyName']} ({res['Constructor']['name']})\n"
+                     embed.add_field(name="Results", value=results_text, inline=False)
+                else:
+                     embed.add_field(name="Results", value="Results are not yet fully available/tabulated for this race.", inline=False)
+                
+                image_url = self._get_circuit_image_url(last_race['Circuit']['circuitId'])
+                embed.set_image(url=image_url)
+                
+                await ctx.send(embed=embed)
+                
+            except Exception as e:
+                print(e)
+                await ctx.send("Could not retrieve last race info.")
 
 async def setup(bot):
     await bot.add_cog(F1Command(bot))
