@@ -18,7 +18,7 @@ class General(commands.Cog):
             color=discord.Color.blue()
         )
 
-        embed.add_field(name="🏎️ F1 Commands", value="`#f1` - Shows current season info (Drivers, Constructors, Next Race)\n`!f1next` - Shows info and a picture of the next race circuit\n`#f1last` - Shows info and results of the latest race\n`#f1c {circuit}` - Shows information and previous winner for a specific circuit\n`#f1con` - Shows only constructor standings\n`#f1dri` - Shows only driver standings", inline=False)
+        embed.add_field(name="🏎️ F1 Commands", value="`#f1` - Shows current season info (Drivers, Constructors, Next Race)\n`#f1next` - Shows info and a picture of the next race circuit\n`#f1last` - Shows info and results of the latest race\n`#f1c {circuit}` - Shows information and previous winner for a specific circuit\n`#f1con` - Shows only constructor standings\n`#f1dri` - Shows only driver standings", inline=False)
         embed.add_field(name="⚙️ General", value="`#status` - Shows the status of the server\n`#ping` - Shows the bot's latency", inline=False)
 
         await ctx.send(embed=embed)
