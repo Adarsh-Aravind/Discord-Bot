@@ -1,6 +1,7 @@
-﻿import discord
+import discord
 from discord.ext import commands, tasks
 import feedparser
+import aiohttp
 
 import os
 
@@ -25,9 +26,17 @@ class YouTube(commands.Cog):
             if not channel:
                 continue
 
-            feed = feedparser.parse(
-                f"https://www.youtube.com/feeds/videos.xml?channel_id={yt_id}"
-            )
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f"https://www.youtube.com/feeds/videos.xml?channel_id={yt_id}", timeout=15) as response:
+                        if response.status != 200:
+                            continue
+                        content = await response.read()
+            except Exception as e:
+                print(f"Error fetching YouTube feed for {yt_id}: {e}")
+                continue
+
+            feed = feedparser.parse(content)
 
             if not feed.entries:
                 continue
